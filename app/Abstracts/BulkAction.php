@@ -248,7 +248,8 @@ abstract class BulkAction
 
     public function deleteTransactions($request)
     {
-        $transactions = $this->getSelectedRecords($request, 'category');
+        // DeleteTransaction removes the recurring and taxes relations of every record.
+        $transactions = $this->getSelectedRecords($request, ['category', 'recurring', 'taxes']);
 
         foreach ($transactions as $transaction) {
             try {

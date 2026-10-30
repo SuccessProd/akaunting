@@ -22,7 +22,7 @@ class Contacts extends ApiController
      */
     public function index()
     {
-        $contacts = Contact::collect();
+        $contacts = Contact::with('owner')->collect();
 
         return Resource::collection($contacts);
     }

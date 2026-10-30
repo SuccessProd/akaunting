@@ -15,6 +15,8 @@
         var document_default_currency = '{{ $currency_code }}';
         var document_currencies = {!! $currencies !!};
         var document_taxes = {!! $taxes !!};
+        var document_tax_rate_note = {!! json_encode(trans('documents.tax_rate.charged_at')) !!};
+        var document_percent_position = '{{ setting('localisation.percent_position', 'after') }}';
         var document_app_env = '{{ $document_app_env }}';
 
         if (typeof aka_currency !== 'undefined') {

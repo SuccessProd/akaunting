@@ -19,7 +19,7 @@ class Taxes extends ApiController
      */
     public function index()
     {
-        $taxes = Tax::collect();
+        $taxes = Tax::with('owner')->collect();
 
         return Resource::collection($taxes);
     }

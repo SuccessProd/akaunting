@@ -80,7 +80,7 @@
                                 <x-index.bulkaction.single
                                     id="{{ $item->id }}"
                                     name="{{ $item->name }}"
-                                    :disabled="($item->isTransferCategory()) ? true : false"
+                                    :disabled="$item->isTransferCategory() || $item->isDefaultCategory()"
                                 />
                             </x-table.td>
 
@@ -109,21 +109,49 @@
                                         </x-tooltip>
 
                                         <div class="flex items-center font-bold ltr:ml-2 rtl:mr-2">
-                                            {{ $item->name }}
+                                            @if (! empty($item->custom_row_url))
+                                                <x-link href="{{ $item->row_url }}" class="text-sm font-semibold sm:mt-0 sm:mb-0 leading-4" override="class">
+                                                    <x-link.hover color="to-black-400">
+                                                        {{ $item->name }}
+                                                    </x-link.hover>
+                                                </x-link>
+                                            @else
+                                                {{ $item->name }}
+                                            @endif
                                         </div>
+
+                                        @if (! $item->enabled)
+                                            <x-index.disable text="{{ trans_choice('general.categories', 1) }}" />
+                                        @endif
+
+                                        @if ($item->isDefaultCategory())
+                                            <x-index.default text="{{ trans('categories.default_type', ['type' => $item->default_category_label]) }}" />
+                                        @endif
                                     </div>
                                 @else
                                     <div class="flex items-center">
                                         <span class="material-icons text-{{ $item->color }}" class="text-3xl" style="color:{{ $item->color }};">circle</span>
 
                                         <span class="font-bold ltr:ml-2 rtl:mr-2">
-                                            {{ $item->name }}
+                                            @if (! empty($item->custom_row_url))
+                                                <x-link href="{{ $item->row_url }}" class="text-sm font-semibold sm:mt-0 sm:mb-0 leading-4" override="class">
+                                                    <x-link.hover color="to-black-400">
+                                                        {{ $item->name }}
+                                                    </x-link.hover>
+                                                </x-link>
+                                            @else
+                                                {{ $item->name }}
+                                            @endif
                                         </span>
-                                    </div>
-                                @endif
 
-                                @if (! $item->enabled)
-                                    <x-index.disable text="{{ trans_choice('general.categories', 1) }}" />
+                                        @if (! $item->enabled)
+                                            <x-index.disable text="{{ trans_choice('general.categories', 1) }}" />
+                                        @endif
+
+                                        @if ($item->isDefaultCategory())
+                                            <x-index.default text="{{ trans('categories.default_type', ['type' => $item->default_category_label]) }}" />
+                                        @endif
+                                    </div>
                                 @endif
                             </x-table.td>
 

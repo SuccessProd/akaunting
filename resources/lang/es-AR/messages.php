@@ -14,6 +14,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Error: No puedes cambiar/eliminar la transacción porque pertenece a una transferencia!',
         'over_payment'      => 'Error: ¡Pago no añadido! La cantidad que ingresó pasa el total: :amount',
         'not_user_company'  => 'Error: ¡No tiene permiso para gestionar esta empresa!',
         'customer'          => 'Error: Usuario no creado! :name ya utiliza esta dirección de correo electrónico.',

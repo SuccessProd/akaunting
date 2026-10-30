@@ -29,6 +29,7 @@ return [
         'no_file'           => 'Fehler: Keine Datei ausgewählt!',
         'last_category'     => 'Fehler: Die letzte <b>:type</b>-Kategorie kann nicht gelöscht werden!',
         'transfer_category' => 'Fehler: Die <b>:type</b>-Umbuchungskategorie kann nicht gelöscht werden!',
+        'transfer_transaction' => 'Fehler: Sie dürfen die Transaktion nicht ändern/löschen, da sie zu einer Umbuchung gehört!',
         'change_type'       => 'Fehler: Der Typ kann nicht geändert werden, da :text zugeordnet ist!',
         'invalid_apikey'    => 'Fehler: Der eingegebene API-Schlüssel ist ungültig!',
         'empty_apikey'      => 'Fehler: Sie haben Ihren API-Schlüssel nicht hinterlegt! <a href=":url" class="font-bold underline underline-offset-4">Klicken Sie hier</a>, um den API-Schlüssel einzugeben.',

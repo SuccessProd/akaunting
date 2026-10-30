@@ -13,6 +13,11 @@ class AccountBalance extends Widget
 
     public $report_class = 'App\Reports\IncomeExpense';
 
+    public $default_settings = [
+        'width' => '50',
+        'limit' => 5,
+    ];
+
     public function show()
     {
         $this->setData();
@@ -27,7 +32,7 @@ class AccountBalance extends Widget
         $accounts = Account::withSum('income_transactions as income_sum', 'amount')
             ->withSum('expense_transactions as expense_sum', 'amount')
             ->enabled()
-            ->take(5)
+            ->take((int) ($this->model?->settings?->limit ?? 5))
             ->get()
             ->map(function ($account) {
                 $balance = $account->opening_balance

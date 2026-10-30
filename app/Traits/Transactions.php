@@ -57,6 +57,26 @@ trait Transactions
         return ! $this->isTransferTransaction();
     }
 
+    public function isJournalTransaction(): bool
+    {
+        if (! module_is_enabled('double-entry')) {
+            return false;
+        }
+
+        $transaction = $this instanceof Transaction ? $this : ($this->transaction ?? $this->model ?? null);
+
+        if (! $transaction instanceof Transaction) {
+            return false;
+        }
+
+        return ! empty($transaction->journal_ledger);
+    }
+
+    public function isNotJournalTransaction(): bool
+    {
+        return ! $this->isJournalTransaction();
+    }
+
     public function isSplitTransaction(): bool
     {
         $type = $this->type ?? $this->transaction->type ?? $this->model->type ?? Transaction::INCOME_TYPE;

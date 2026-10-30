@@ -29,6 +29,7 @@ return [
         'no_file'           => 'Fout: geen bestand geselecteerd!',
         'last_category'     => 'Fout: Kan de laatste <b>:type</b> categorie niet verwijderen!',
         'transfer_category' => 'Fout: Kan de overdracht <b>:type</b> categorie niet verwijderen!',
+        'transfer_transaction' => 'Fout: U heeft geen toestemming om de transactie te wijzigen/verwijderen omdat deze bij een overboeking hoort!',
         'change_type'       => 'Fout: Kan het type niet wijzigen omdat :text gerelateerd is!',
         'invalid_apikey'    => 'Fout: De ingevoerde API-sleutel is ongeldig!',
         'empty_apikey'      => 'Fout: U heeft uw API-sleutel niet ingevoerd! <a href=":url" class="font-bold underline underline-offset-4">Klik hier</a> om uw API-sleutel in te voeren.',

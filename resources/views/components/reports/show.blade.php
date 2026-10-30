@@ -10,6 +10,12 @@
     ></x-slot>
 
     <x-slot name="buttons">
+        @stack('button_refresh_start')
+
+        <x-reports.refresh :report="$class" />
+
+        @stack('button_refresh_end')
+
         @stack('button_print_start')
 
         <x-link href="{{ url($class->getUrl('print')) }}" target="_blank">
@@ -69,7 +75,10 @@
 
             @include($class->views['filter'])
 
-            @include($class->views[$class->type])
+            {{-- The report options bar marks it busy while Update loads the next page --}}
+            <div id="report-content">
+                @include($class->views[$class->type])
+            </div>
         </div>
     </x-slot>
 

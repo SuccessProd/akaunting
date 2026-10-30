@@ -18,6 +18,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Feil: Du har ikke lov til å endre/slette transaksjonen fordi den tilhører en overføring!',
         'over_payment'      => 'Feil: Betaling er ikke lagt til! Beløpet overskrider totalbeløp: :amount',
         'not_user_company'  => 'Feil: Du ikke kan administrere dette foretaket.',
         'customer'          => 'Feil: Bruker ble ikke opprettet. :name bruker allerede denne e-postadressen.',

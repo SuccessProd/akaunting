@@ -29,6 +29,7 @@ return [
         'no_file'           => 'Error: no ha seleccionado ningún archivo.',
         'last_category'     => 'Error: no se puede eliminar la última categoría de <b>:type</b>.',
         'transfer_category' => 'Error: no se puede eliminar la categoría de transferencia <b>:type</b>.',
+        'transfer_transaction' => 'Error: no puede modificar ni eliminar la transacción porque pertenece a una transferencia.',
         'change_type'       => 'Error: no se puede cambiar el tipo porque tiene :text asociados.',
         'invalid_apikey'    => 'Error: ¡La clave de API introducida no es válida!',
         'empty_apikey'      => 'Error: no ha introducido su clave de API. <a href=":url" class="font-bold underline underline-offset-4">Haga clic aquí</a> para introducirla.',

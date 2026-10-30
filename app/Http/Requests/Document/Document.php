@@ -35,7 +35,7 @@ class Document extends FormRequest
         }
 
         if ($this->files->get('company_logo')) {
-            $company_logo = 'mimes:' . config('filesystems.mimes') . '|between:0,' . config('filesystems.max_size') * 1024 . '|dimensions:max_width=1000,max_height=1000';
+            $company_logo = 'mimes:' . config('filesystems.mimes') . '|between:0,' . config('filesystems.max_size') * 1024 . '|dimensions:max_width=' . config('filesystems.max_width') . ',max_height=' . config('filesystems.max_height');
         }
 
         if ($this->files->get('attachment')) {
@@ -43,7 +43,7 @@ class Document extends FormRequest
         }
 
         // Get company id
-        $company_id = (int) $this->request->get('company_id');
+        $company_id = (int) $this->request->get('company_id', company_id());
 
         $rules = [
             'type'                  => 'required|string',
@@ -53,13 +53,14 @@ class Document extends FormRequest
             'issued_at'             => 'required|date_format:Y-m-d H:i:s|before_or_equal:due_at',
             'due_at'                => 'required|date_format:Y-m-d H:i:s|after_or_equal:issued_at',
             'amount'                => 'required',
-            'items.*.name'          => 'required|string',
+            'items.*.name'          => 'required|string|max:255',
             'items.*.price'         => 'required|amount',
+            'items.*.tax_rates.*'   => 'nullable|numeric|min:0',
             'currency_code'         => 'required|string|currency',
             'currency_rate'         => 'required|gt:0',
-            'contact_id'            => 'required|integer',
+            'contact_id'            => 'required|integer|exists:contacts,id,company_id,' . $company_id . ',deleted_at,NULL',
             'contact_name'          => 'required|string',
-            'category_id'           => 'required|integer',
+            'category_id'           => 'required|integer|exists:categories,id,company_id,' . $company_id . ',deleted_at,NULL',
             'company_logo'          => $company_logo,
             'attachment.*'          => $attachment,
             'recurring_count'       => 'gte:0',
@@ -94,8 +95,12 @@ class Document extends FormRequest
                 $size = 10;
                 $quantityRule = ['required'];
 
+                // A request does not always carry a quantity for every item, which the
+                // required rule below reports, so the key is not assumed to be there.
+                $quantity = $item['quantity'] ?? null;
+
                 try {
-                    $items[$key]['quantity'] = calculation_to_quantity($item['quantity']);
+                    $items[$key]['quantity'] = calculation_to_quantity($quantity);
                 } catch (\InvalidArgumentException $e) {
                     $quantityRule[] = function ($attribute, $value, $fail) {
                         $fail(trans('validation.custom.invalid_quantity', [
@@ -104,7 +109,7 @@ class Document extends FormRequest
                     };
                 }
 
-                if (Str::contains($item['quantity'], ['.', ','])) {
+                if (Str::contains((string) $quantity, ['.', ','])) {
                     $size = 12;
                 }
 

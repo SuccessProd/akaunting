@@ -105,7 +105,7 @@
             <div :id="'search-field-operator-' + _uid" class="absolute top-12 ltr:left-8 rtl:right-8 py-2 bg-white rounded-md border border-gray-200 shadow-xl z-20 list-none dropdown-menu operator" :class="[{'show': visible.operator}]">
                 <li v-if="equal" class="w-full flex items-center px-2 h-9 leading-9 whitespace-nowrap">
                     <button type="button" class="w-full h-full flex items-center rounded-md px-2 text-sm hover:bg-lilac-100" @click="onOperatorSelected('=')">
-                        <span class="material-icons text-2xl transform pointer-events-none">drag_handle</span>
+                        <span class="material-icons text-2xl transform pointer-events-none mx-auto">drag_handle</span>
                         <span class="text-gray hidden pointer-events-none">{{ operatorIsText }}
                         </span>
                     </button>
@@ -120,7 +120,7 @@
 
                 <li v-if="range" class="w-full flex items-center px-2 h-9 leading-9 whitespace-nowrap">
                     <button type="button" class="w-full h-full flex items-center rounded-md px-2 text-sm hover:bg-lilac-100" @click="onOperatorSelected('><')">
-                        <span class="material-icons text-2xl transform rotate-90 pointer-events-none">height</span>
+                        <span class="material-icons text-2xl transform rotate-90 pointer-events-none mx-auto">height</span>
                         <span class="text-gray hidden pointer-events-none">{{ operatorIsNotText }}</span>
                     </button>
                 </li>
@@ -292,6 +292,10 @@ export default {
             values: [],
             useRemoteSearchValues: false,
             multiple_values: [],
+
+            // Every value ever loaded for the current option, kept so a selection
+            // survives a remote search that replaces the visible list.
+            known_values: [],
             current_operator: '',
             current_value: null,
             show_date: false,
@@ -432,6 +436,8 @@ export default {
                         });
                     }, this);
 
+                    this.rememberValues();
+
                     this.option_values[value] = this.values;
                     this.useRemoteSearchValues = true;
                 })
@@ -469,12 +475,9 @@ export default {
             search_string[path] = {};
 
             this.filtered.forEach(function (filter, index) {
-                if (list) {
-                    args += sign + 'search=';
-                    sign = '&';
-                }
-
-                if (! args) {
+                // One search parameter for all filters, not one per filter: a
+                // repeated query key leaves PHP with only the last of them.
+                if (args.indexOf('search=') === -1) {
                     args += sign + 'search=';
                     sign = '&';
                 }
@@ -611,6 +614,8 @@ export default {
                 this.onSetOptionValue(value, option_url, option_fields);
             } else {
                 this.values = (this.option_values[value]) ? this.option_values[value] : [];
+
+                this.rememberValues();
             }
 
             this.$nextTick(() => {
@@ -652,6 +657,8 @@ export default {
                         });
                     }
                 }, this);
+
+                this.rememberValues();
 
                 this.option_values[value] = this.values;
                 this.useRemoteSearchValues = false;
@@ -752,16 +759,29 @@ export default {
             this.search = '';
         },
 
+        rememberValues() {
+            this.values.forEach(function (value) {
+                if (! this.known_values.some(known => known.key == value.key)) {
+                    this.known_values.push(value);
+                }
+            }, this);
+        },
+
         onMultipleValueSelected() {
             this.show_close_icon = true;
             let select_values = [];
 
             this.onChangeSearchAndFilterText(this.enterPlaceholder, false);
 
-            for (let i = 0; i < this.values.length; i++) {
+            // Resolve against every value loaded for this option, not just the ones
+            // currently visible: a remote search replaces this.values with its own
+            // results, which would otherwise drop earlier selections.
+            let known_values = this.known_values.length ? this.known_values : this.values;
+
+            for (let i = 0; i < known_values.length; i++) {
                 this.multiple_values.forEach(function (value, index) {
-                    if (this.values[i].key == value) {
-                        select_values.push(this.values[i]);
+                    if (known_values[i].key == value) {
+                        select_values.push(known_values[i]);
                     }
                 }, this);
             }
@@ -799,6 +819,7 @@ export default {
             this.search = '';
 
             this.multiple_values = [];
+            this.known_values = [];
         },
 
         onValueDateRange() {
@@ -919,10 +940,13 @@ export default {
         }
 
         if (this.value) {
-            this.value = this.value.replace(/\s+[a-zA-Z\w]+[<=]+/g, '-to-');
-            this.value = this.value.replace('>=', ':');
+            // Normalise a local copy: mutating the prop triggers a Vue warning
+            // and would be discarded on a parent re-render anyway.
+            let value = this.value
+                .replace(/\s+[a-zA-Z\w]+[<=]+/g, '-to-')
+                .replace('>=', ':');
 
-            let search_string = this.value.replace('not ', '').replace(' not ', ' ');
+            let search_string = value.replace('not ', '').replace(' not ', ' ');
 
             search_string = search_string.split(' ');
 
@@ -939,11 +963,14 @@ export default {
                     let operator = '=';
                     let value = '';
                     let value_assigned = false;
+                    let matched = false;
 
                     this.filter_list.forEach(function (_filter, i) {
                         let filter_values = this.convertOption(_filter.values);
 
                         if (_filter.key == filter[0]) {
+                            matched = true;
+
                             option = _filter.value;
                             operator = _filter.operator;
 
@@ -1011,6 +1038,15 @@ export default {
                             }
                         }
                     }, this);
+
+                    if (! matched) {
+                        // Not a known filter key, so keep the token as a plain
+                        // search term instead of pushing an empty chip and
+                        // dropping the value altogether.
+                        search_values.push(string.replace(/[\"]+/g, ''));
+
+                        return;
+                    }
 
                     this.filtered.push({
                         option: option,

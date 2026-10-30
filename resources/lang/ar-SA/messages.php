@@ -29,6 +29,7 @@ return [
         'no_file'           => 'خطأ: لم يتم تحديد أي ملف!',
         'last_category'     => 'خطأ: لا يمكن حذف آخر فئة <b>:type</b>!',
         'transfer_category' => 'خطأ: لا يمكن حذف فئة التحويل <b>:type</b>!',
+        'transfer_transaction' => 'خطأ: لا يُسمح لك بتغيير المعاملة أو حذفها لأنها تابعة لتحويل!',
         'change_type'       => 'خطأ: لا يمكنك تغيير النوع لارتباطه مع :text!',
         'invalid_apikey'    => 'خطأ: مفتاح API الذي تم إدخاله غير صالح!',
         'empty_apikey'      => 'خطأ: لم تقم بإدخال مفتاح API! <a href=":url" class="font-bold underline underline-offset-4">انقر هنا</a> لإدخال مفتاح API الخاص بك.',

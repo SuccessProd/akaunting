@@ -14,6 +14,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Xəta: Əməliyyatı dəyişdirmək/silmək mümkün deyil, çünki o, bir köçürməyə aiddir!',
         'over_payment'      => 'Xəta: Ödəniş əlavə edilmədi! Daxil etdiyiniz :amount cəmi keçir.',
         'not_user_company'  => 'Xəta: Bu şirkəti idarə etmə icazəniz yoxdur!',
         'customer'          => 'Xəta: İstifadəçi yaradılmadı. :name bu e-poçt ünvanı istifadə edilir.',

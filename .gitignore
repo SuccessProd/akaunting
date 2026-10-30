@@ -96,3 +96,10 @@ modules/*
 !modules/.gitkeep
 .laravelstatsrc
 .DS_Store
+.claude.json
+.mcp.json
+.agents
+.claude
+.docs
+AGENTS.md
+CLAUDE.md

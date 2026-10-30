@@ -80,7 +80,7 @@
 
                                     <div class="sm:col-span-3">
                                         <base-input not-required :label="translations.company.country" :error="onFailErrorGet('country')">
-                                            <el-select v-model="company.country" filterable :disabled="Boolean(company.country)">
+                                            <el-select v-model="company.country" filterable :disabled="country">
                                                 <el-option
                                                     v-for="(country, index) in sortedCountries"
                                                     :key="index"
@@ -100,7 +100,7 @@
                                         {{  translations.company.logo }}
                                     </label>
 
-                                    <akaunting-dropzone-file-upload ref="dropzoneWizard" class="form-file dropzone-column" style="width: 10.8rem; height: 10.8rem;" preview-classes="single" :attachments="logo" :v-model="logo">
+                                    <akaunting-dropzone-file-upload ref="dropzoneWizard" class="form-file dropzone-column" style="width: 10.8rem; height: 10.8rem;" preview-classes="single" :attachments="logo" :resize-options="{ maxWidth: 1000, maxHeight: 1000, crop: true, aspectRatio: 1 }" :v-model="logo" @crop-state="logoCropProcessing = $event" :text-cancel-crop="translations.company.crop_cancel" :text-apply-crop="translations.company.crop_apply">
                                     </akaunting-dropzone-file-upload>
 
                                     <div v-if="onFailErrorGet('logo')" class="text-red text-sm mt-1 block" v-html="onFailErrorGet('logo')"></div>
@@ -119,7 +119,7 @@
                 <button
                     type="submit"
                     id="button"
-                    :disabled="button_loading_company"
+                    :disabled="button_loading_company || logoCropProcessing"
                     class="w-1/2 relative flex items-center justify-center bg-green hover:bg-green-700 text-white px-6 py-1.5 text-base rounded-lg disabled:bg-green-100"
                     @click="onEditSave($event)"
                 >
@@ -204,7 +204,9 @@
                 real_date: "",
                 lang_data: '',
                 sorted_countries: [],
-                button_loading_company: false
+                button_loading_company: false,
+                logoCropProcessing: false,
+                country: false
             };
         },
 
@@ -232,6 +234,7 @@
 
         mounted() {
             let company_data = this.company;
+            this.country = Boolean(company_data.country);
 
             this.onDataWatch(company_data);
         },
@@ -307,6 +310,10 @@
 
             onEditSave(event) {
                 event.preventDefault();
+
+                if (this.logoCropProcessing) {
+                    return;
+                }
 
                 this.button_loading_company = true;
 

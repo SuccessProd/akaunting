@@ -12,6 +12,7 @@ return [
         'disabled'          => ':type disabled!',
     ],
     'error' => [
+        'transfer_transaction' => 'Lỗi: Bạn không được phép sửa/xóa giao dịch này vì nó thuộc về một lần chuyển khoản!',
         'over_payment'      => 'Error: Payment not added! The amount you entered passes the total: :amount',
         'not_user_company'  => 'Lỗi: Bạn không được phép để quản lý công ty này!',
         'customer'          => 'Lỗi: Người dùng chưa được tạo! Đã có người dùng :name sử dụng địa chỉ email này.',

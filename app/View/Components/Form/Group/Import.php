@@ -31,6 +31,13 @@ class Import extends Form
             $this->options = $options;
         }
 
+        // The caller may pass its own file types instead of building the accepted list
+        if (! empty($this->types) && empty($this->options['acceptedFiles'])) {
+            $file_types = array_filter(array_map('trim', $this->types));
+
+            $this->options['acceptedFiles'] = '.' . implode(',.', $file_types);
+        }
+
         $this->options['maxFilesize'] = config('filesystems.max_size');
 
         return view('components.form.group.import');

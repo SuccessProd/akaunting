@@ -38,25 +38,14 @@ class Categories extends Controller
 
         $categories = $query->collect();
 
-        $hide_code_column = true;
-
         $search_string_type = search_string_value('type');
-        $selected_types = ! empty($search_string_type) ? explode(',', $search_string_type) : array_keys($types);
 
-        foreach (config('type.category', []) as $type => $config) {
-            if (! is_array($config)) {
-                continue;
-            }
+        $filtered_types = is_array($search_string_type) ? $search_string_type : explode(',', $search_string_type);
 
-            if (! in_array($type, $selected_types)) {
-                continue;
-            }
+        $selected_types = ! empty($search_string_type) ? array_intersect($filtered_types, array_keys($types)) : array_keys($types);
 
-            if (empty($config['hide']) || ! in_array('code', $config['hide'])) {
-                $hide_code_column = false;
-                break;
-            }
-        }
+        // Hide the column only when the code is hidden for all of the listed types
+        $hide_code_column = ! in_array(false, $this->hideCodeCategoryTypes($selected_types), true);
 
         return $this->response('settings.categories.index', compact('categories', 'types', 'hide_code_column'));
     }
@@ -162,6 +151,7 @@ class Categories extends Controller
     public function edit(Category $category)
     {
         $type_disabled = (Category::where('type', $category->type)->count() == 1) ?: false;
+        $type_locked = $category->isTypeLocked();
 
         $edited_category_id = $category->id;
 
@@ -205,7 +195,7 @@ class Categories extends Controller
 
         $parent_categories = $categories[$category->type] ?? [];
 
-        return view('settings.categories.edit', compact('category', 'types', 'type_disabled', 'categories', 'parent_categories', 'type_group', 'hide_code_types'));
+        return view('settings.categories.edit', compact('category', 'types', 'type_disabled', 'type_locked', 'categories', 'parent_categories', 'type_group', 'hide_code_types'));
     }
 
     /**

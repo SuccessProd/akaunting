@@ -21,6 +21,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Fel: Du har inte tillåtelse att ändra/ta bort transaktionen eftersom den tillhör en överföring!',
         'over_payment'      => 'Fel: Betalning inte lagt till! Det belopp som du angav överskrider totalen: :amount',
         'not_user_company'  => 'Fel: Du får inte hantera detta företag!',
         'customer'          => 'Fel: Användaren inte skapad! :name använder redan denna e-postadress.',

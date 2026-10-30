@@ -176,6 +176,12 @@ trait Categories
         foreach ($types as $type) {
             $config_type = config('type.category.' . $type, []);
 
+            if (! empty($config_type['show_code'])) {
+                $type_codes[$type] = false;
+
+                continue;
+            }
+
             $type_codes[$type] = ! empty($config_type['hide']) && in_array('code', $config_type['hide']) ? true : false;
         }
 
@@ -234,9 +240,8 @@ trait Categories
         if (is_callable($config['translation']['type'] ?? null)) {
             $name = $config['translation']['type']();
         } else {
-            $group = $config['group'] ?? $type;
-            $plural_type = $count === 1 ? Str::plural($group, 1) : Str::plural($group);
-            $name = ($config['translation']['prefix'] ?? 'general') . '.' . $plural_type;
+            // Translation keys are always plural (general.expenses => Expense|Expenses), trans_choice picks the form
+            $name = ($config['translation']['prefix'] ?? 'general') . '.' . Str::plural($type);
 
             if (! empty($config['alias'])) {
                 $name = $config['alias'] . '::' . $name;
@@ -336,7 +341,7 @@ trait Categories
     public function getNextCategoryCode()
     {
         return Category::isNotSubCategory()->get(['code'])->reject(function ($category) {
-            return !preg_match('/^[0-9]*$/', $category->code);
+            return !preg_match('/^[0-9]+$/', (string) $category->code);
         })->max('code') + 1;
     }
 }

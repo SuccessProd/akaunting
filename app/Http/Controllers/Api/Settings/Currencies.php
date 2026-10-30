@@ -19,7 +19,7 @@ class Currencies extends ApiController
      */
     public function index()
     {
-        $currencies = Currency::collect();
+        $currencies = Currency::with('owner')->collect();
 
         return Resource::collection($currencies);
     }

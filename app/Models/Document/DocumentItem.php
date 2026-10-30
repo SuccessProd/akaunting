@@ -20,7 +20,7 @@ class DocumentItem extends Model
      */
     protected $with = ['taxes'];
 
-    protected $appends = ['discount', 'tax_ids'];
+    protected $appends = ['discount', 'tax_ids', 'tax_rates'];
 
     protected $fillable = [
         'company_id',
@@ -62,7 +62,10 @@ class DocumentItem extends Model
     {
         parent::boot();
 
-        static::saving(fn ($model) => $model->offsetUnset('tax_ids'));
+        static::saving(function ($model) {
+            $model->offsetUnset('tax_ids');
+            $model->offsetUnset('tax_rates');
+        });
     }
 
     public function document()
@@ -77,7 +80,7 @@ class DocumentItem extends Model
 
     public function category()
     {
-        return $this->belongsTo('App\Models\Setting\Category');
+        return $this->belongsTo('App\Models\Setting\Category')->withoutGlobalScope('App\Scopes\Category')->withDefault(['name' => trans('general.na')]);
     }
 
     public function taxes()
@@ -150,8 +153,18 @@ class DocumentItem extends Model
         return $this->taxes->pluck('tax_id')->all();
     }
 
+    /**
+     * The rate each tax was actually charged at, keyed by tax id, so the form
+     * can post it back instead of the tax's current rate.
+     */
+    public function getTaxRatesAttribute(): array
+    {
+        return $this->taxes->pluck('rate', 'tax_id')->all();
+    }
+
     public function onCloning($src, $child = null)
     {
         unset($this->tax_ids);
+        unset($this->tax_rates);
     }
 }

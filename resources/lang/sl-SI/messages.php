@@ -28,6 +28,7 @@ return [
         'no_file'           => 'Napaka: Nobena datoteka ni izbrana!',
         'last_category'     => 'Napaka: Ne morem izbrisati zadnje :type kategorije!',
         'transfer_category' => 'Napaka: Kategorije <b>:type</b> ni mogoče izbrisati!',
+        'transfer_transaction' => 'Napaka: Transakcije ni dovoljeno spreminjati/brisati, ker pripada prenosu!',
         'change_type'       => 'Napaka: vrste ni mogoče spremeniti, ker je povezana s :text!',
         'invalid_apikey'    => 'Napaka: API ključ, ki ste ga vnesli ni veljaven!',
         'empty_apikey'      => 'Napaka: Niste vnesli vašega API ključa! Kliknite <a href=":url" class="font-bold underline underline-offset-4">tukaj</a>, da vnesete vaš API ključ.',

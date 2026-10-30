@@ -14,6 +14,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => '錯誤：您無權修改或刪除交易，因為它屬於轉帳。',
         'over_payment'      => '錯誤：付款未添加! 你輸入的金額超過總金額: :amount',
         'not_user_company'  => '錯誤：您不允許管理此公司！',
         'customer'          => '錯誤：未建立使用者！:name已經使用此電子郵件。',

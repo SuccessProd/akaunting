@@ -74,9 +74,16 @@ class DocumentTotal extends Model
 
                 break;
             case 'tax':
+                // Still needed below to tell a fixed tax from a percentage one
                 $tax = Tax::where('name', $title)->first();
 
-                if (! empty($tax->rate)) {
+                // Prefer the rate this document was charged at, so changing a tax
+                // rate later does not rewrite what an existing document shows.
+                $percent = DocumentItemTax::where('document_id', $this->document_id)
+                    ->where('name', $title)
+                    ->value('rate');
+
+                if (empty($percent) && ! empty($tax->rate)) {
                     $percent = $tax->rate;
                 }
 
@@ -87,9 +94,9 @@ class DocumentTotal extends Model
             $title .= ' (';
 
             if (setting('localisation.percent_position', 'after') === 'after') {
-                $title .= ($this->code === 'discount') ? $percent . '%' : (($tax->type === 'fixed') ? $percent : $percent . '%');
+                $title .= ($this->code === 'discount') ? $percent . '%' : (($tax?->type === 'fixed') ? $percent : $percent . '%');
             } else {
-                $title .= ($this->code === 'discount') ? '%' . $percent : (($tax->type === 'fixed') ? $percent : '%' . $percent);
+                $title .= ($this->code === 'discount') ? '%' . $percent : (($tax?->type === 'fixed') ? $percent : '%' . $percent);
             }
 
             $title .= ')';

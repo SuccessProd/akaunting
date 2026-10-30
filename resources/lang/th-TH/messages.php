@@ -13,6 +13,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'ข้อผิดพลาด: ไม่สามารถแก้ไข/ลบรายการนี้ได้ เนื่องจากเป็นส่วนหนึ่งของการโอน!',
         'over_payment'      => 'Error: Payment not added! The amount you entered passes the total: :amount',
         'not_user_company'  => 'ข้อผิดพลาด: คุณไม่สามารถจัดการบริษัทนี้!',
         'customer'          => 'ข้อผิดพลาด: ผู้ใช้ยังไม่ได้สร้าง! :name ใช้อีเมลนี้แล้ว',

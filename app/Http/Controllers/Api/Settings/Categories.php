@@ -19,7 +19,7 @@ class Categories extends ApiController
      */
     public function index()
     {
-        $categories = Category::withSubCategory()->collect();
+        $categories = Category::with('owner')->withSubCategory()->collect();
 
         return Resource::collection($categories);
     }

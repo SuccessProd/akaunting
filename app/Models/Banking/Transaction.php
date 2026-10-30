@@ -582,7 +582,7 @@ class Transaction extends Model
         } catch (\Exception $e) {}
 
         try {
-            if (! $this->reconciled && empty($this->document_id) && $this->isNotTransferTransaction()) {
+            if (! $this->reconciled && empty($this->document_id) && $this->isNotTransferTransaction() && $this->isNotJournalTransaction()) {
                 $actions[] = [
                     'title' => trans('general.edit'),
                     'icon' => 'edit',
@@ -598,6 +598,7 @@ class Transaction extends Model
         try {
             if (empty($this->document_id) 
                 && $this->isNotTransferTransaction()
+                && $this->isNotJournalTransaction()
                 && $this->isNotSplitTransaction()
             ) {
                 $actions[] = [
@@ -618,6 +619,7 @@ class Transaction extends Model
                 && empty($this->document_id)
                 && empty($this->recurring)
                 && $this->isNotTransferTransaction()
+                && $this->isNotJournalTransaction()
             ) {
                 $connect = [
                     'type' => 'button',
@@ -665,7 +667,7 @@ class Transaction extends Model
         } catch (\Exception $e) {}
 
         if ($prefix != 'recurring-transactions') {
-            if ($this->isNotTransferTransaction()) {
+            if ($this->isNotTransferTransaction() && $this->isNotJournalTransaction()) {
                 $actions[] = [
                     'type' => 'divider',
                 ];

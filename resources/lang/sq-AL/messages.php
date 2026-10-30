@@ -16,6 +16,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Gabim: Nuk ju lejohet të ndryshoni/fshini transaksionin sepse i përket një transferimi!',
         'over_payment'      => 'Gabim: Pagesa nuk u shtua! Shuma që keni futur kalon totalin: amount',
         'not_user_company'  => 'Gabim: Nuk ju lejohet të menaxhoni këtë kompani!',
         'customer'          => 'Gabim: Përdoruesi nuk u krijua! :name tashmë përdor këtë adresë e-maili.',

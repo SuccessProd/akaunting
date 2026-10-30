@@ -11,16 +11,20 @@ use App\Traits\Owners;
 use App\Traits\SearchString;
 use App\Traits\Sources;
 use App\Traits\Tenants;
+use App\Utilities\SearchStringColumns;
 use GeneaLabs\LaravelModelCaching\Traits\Cachable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Laratrust\Contracts\Ownable;
 use Lorisleiva\LaravelSearchString\Concerns\SearchString as LaravelSearchString;
+use Lorisleiva\LaravelSearchString\Visitors\BuildColumnsVisitor;
 
 abstract class Model extends Eloquent implements Ownable
 {
-    use Cachable, DateTime, LaravelSearchString, Owners, SearchString, SoftDeletes, Sortable, Sources, Tenants;
+    use Cachable, DateTime, LaravelSearchString, Owners, SearchString, SoftDeletes, Sortable, Sources, Tenants {
+        LaravelSearchString::getSearchStringVisitors as getPackageSearchStringVisitors;
+    }
 
     protected $tenantable = true;
 
@@ -121,9 +125,7 @@ abstract class Model extends Eloquent implements Ownable
         $request->merge(['sort' => $request_sort]);
         // This line disabled because broken sortable issue.
         //$request->offsetUnset('direction');
-        $limit = (int) $request->get('limit', setting('default.list_limit', '25'));
-
-        return $query->paginate($limit);
+        return $query->paginate(list_limit());
     }
 
     public function scopeUsingSearchString(Builder $query, string|null $string = null)
@@ -137,6 +139,18 @@ abstract class Model extends Eloquent implements Ownable
         $this->getSearchStringManager()->updateBuilder($query, $string);
 
         event(new SearchStringApplied($query));
+    }
+
+    /**
+     * The package's search string visitors, with a column builder that keeps the rows whose column is empty under a
+     * negated term (SearchStringColumns), so "is X" and "is not X" make up the whole.
+     */
+    public function getSearchStringVisitors($manager, $builder)
+    {
+        return array_map(
+            fn ($visitor) => ($visitor instanceof BuildColumnsVisitor) ? new SearchStringColumns($manager, $builder) : $visitor,
+            $this->getPackageSearchStringVisitors($manager, $builder),
+        );
     }
 
     /**

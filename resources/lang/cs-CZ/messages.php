@@ -28,6 +28,7 @@ return [
         'no_file'           => 'Chyba: Nebyl vybrán žádný soubor!',
         'last_category'     => 'Chyba: Nemohu smazat poslední kategorii :type ! ',
         'transfer_category' => 'Chyba: Nemohu odstranit převod <b>:type</b> kategorie!',
+        'transfer_transaction' => 'Chyba: Nemáte oprávnění měnit/mazat transakci, protože patří k převodu!',
         'change_type'       => 'Chyba: Nelze změnit typ, je k :text relativní!',
         'invalid_apikey'    => 'Chyba: Zadaný API klíč je neplatný!',
         'empty_apikey'      => 'Chyba: Není vložen váš API klíč!  <a href=":url" class="font-bold underline underline-offset-4">Klikněte zde</a> pro vložení vašeho API klíče.',

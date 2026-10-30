@@ -19,7 +19,7 @@ class Reports extends ApiController
      */
     public function index()
     {
-        $reports = Report::collect();
+        $reports = Report::with('owner')->collect();
 
         return Resource::collection($reports);
     }

@@ -49,7 +49,12 @@ trait SearchString
 
             $extracted = trim($variable[1], '"\'');
 
-            if (str_contains($column, ':')) {
+            // ':' and '=' are single-value (exact match) operators, so return
+            // immediately. '>', '<', '>=' and '<=' are range operators that may
+            // repeat for the same column, so they fall through and accumulate.
+            $operator = substr($column, strlen($name));
+
+            if (str_starts_with($operator, ':') || str_starts_with($operator, '=')) {
                 return $extracted;
             }
 
@@ -143,6 +148,7 @@ trait SearchString
 
         $valid_columns = array_unique(array_merge(
             array_keys($model_config_columns),
+            array_values(array_filter($model_config_columns, 'is_string')),
             array_values(config('search-string.default.keywords', [])),
             array_keys(config('search-string.default.columns', [])),
         ));

@@ -13,6 +13,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'خرابی: آپ اس لین دین کو تبدیل یا حذف نہیں کر سکتے کیونکہ یہ ایک منتقلی کا حصہ ہے!',
         'over_payment'      => 'Error: Payment not added! Amount passes the total.',
         'not_user_company'  => 'نقص: آپ اس کمپنی کا انتظام کرنے کی اجازت نہیں!',
         'customer'          => 'نقص: صارف نہیں بنایا! : ای میل ایڈریس نام پہلے ہی استعمال میے ہے ۔',

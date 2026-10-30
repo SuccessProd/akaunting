@@ -3,13 +3,22 @@
         'relative',
         $width,
     ])
-    data-tooltip-target="{{ $id }}"
+    @if ($dynamicId)
+        :data-tooltip-target="{!! $dynamicId !!}"
+    @else
+        data-tooltip-target="{{ $id }}"
+    @endif
     data-tooltip-placement="{{ $placement }}"
 >
     {!! $slot !!}
 </span>
 
-<div id="{{ $id }}"
+<div
+    @if ($dynamicId)
+        :id="{!! $dynamicId !!}"
+    @else
+        id="{{ $id }}"
+    @endif
     role="tooltip"
     @class([
         'inline-block absolute invisible z-20 py-1 px-2',

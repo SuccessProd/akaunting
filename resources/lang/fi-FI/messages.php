@@ -14,6 +14,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Virhe: Sinulla ei ole oikeutta muuttaa tai poistaa tapahtumaa, koska se kuuluu siirtoon!',
         'over_payment'      => 'Virhe: Maksua ei lisätty! Antamasi summa ylittää summan: :amount',
         'not_user_company'  => 'Virhe: Sinulla ei ole oikeutta ohjata tätä yritystä!',
         'customer'          => 'Virhe: Käyttäjää ei luotu! :name käyttää jo tätä sähköpostiosoitetta.',

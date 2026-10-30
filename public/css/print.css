@@ -43,8 +43,18 @@ html[dir="rtl"] .right-column {
     font-size: 10px;
 }
 
-.text-medium {
-    font-weight: 500;
+/* Same DomPDF numeric-weight problem as .font-semibold below; 500 has no matching
+   variant either, so it resolves to `normal` for DomPDF and back to 500 for browsers. */
+.text-medium,
+.font-medium {
+    font-weight: normal;
+}
+
+@supports (display: flex) {
+    .text-medium,
+    .font-medium {
+        font-weight: 500;
+    }
 }
 
 .text-normal {
@@ -55,20 +65,26 @@ html[dir="rtl"] .right-column {
     font-size: 12px;
 }
 
-.text-semibold {
-    font-weight: 600;
+/* DomPDF cannot map the numeric weight 600 to a variant of the loaded family,
+   so it falls back to the default Base-14 font (Helvetica/WinAnsi). That font has
+   no Cyrillic/Greek glyphs, so those characters print as "?" (Latin looks fine,
+   which is why this only shows up on non-Latin locales). The `bold` keyword maps
+   to DejaVu Sans Bold correctly. Browsers get 600 back in the @supports block below. */
+.text-semibold,
+.font-semibold {
+    font-weight: bold;
 }
 
-.font-semibold {
-    font-weight: 600;
+/* Browsers keep the original 600 weight; DomPDF ignores @supports. */
+@supports (display: flex) {
+    .text-semibold,
+    .font-semibold {
+        font-weight: 600;
+    }
 }
 
 .font-bold {
     font-weight: 700;
-}
-
-.font-medium {
-    font-weight: 500;
 }
 
 .row {
@@ -369,8 +385,7 @@ html[dir="ltr"] .ltr\:float-left {
     float: left !important;
 }
 
-html[dir="rtl"] .float-left,
-html[dir="rtl"] .ltr\:float-left {
+html[dir="rtl"] .float-left {
     float: left !important;
 }
 
@@ -379,8 +394,7 @@ html[dir="ltr"] .ltr\:float-right {
     float: right !important;
 }
 
-html[dir="rtl"] .float-right,
-html[dir="rtl"] .ltr\:float-right {
+html[dir="rtl"] .float-right {
     float: right !important;
 }
 
@@ -393,13 +407,11 @@ html[dir="rtl"] .rtl\:float-right {
 }
 
 /* DomPDF compatibility: [class~] fallback for Tailwind escaped class names (ltr\: / rtl\:) */
-html[dir="ltr"] [class~="ltr:float-left"],
-html[dir="rtl"] [class~="ltr:float-left"] {
+html[dir="ltr"] [class~="ltr:float-left"] {
     float: left !important;
 }
 
-html[dir="ltr"] [class~="ltr:float-right"],
-html[dir="rtl"] [class~="ltr:float-right"] {
+html[dir="ltr"] [class~="ltr:float-right"] {
     float: right !important;
 }
 
@@ -880,6 +892,43 @@ html[dir="ltr"] .rp-float-right {
 
 html[dir="rtl"] .rp-float-right {
     float: left;
+}
+
+/* The applied chips, components/reports/applied.blade.php */
+.rp-applied {
+    width: auto;
+    margin: 12px 0 4px 0;
+    font-size: 12px;
+}
+
+.rp-applied th,
+.rp-applied td {
+    padding: 2px 0;
+    vertical-align: top;
+}
+
+.rp-applied th {
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+html[dir="ltr"] .rp-applied th {
+    text-align: left;
+    padding-right: 16px;
+}
+
+html[dir="rtl"] .rp-applied th {
+    text-align: right;
+    padding-left: 16px;
+}
+
+/* dompdf does not mirror table columns, so in a PDF the value keeps the left side and the table the left margin */
+html[dir="rtl"] .rp-applied {
+    margin-left: auto;
+}
+
+html[dir="rtl"] .rp-applied td {
+    padding-left: 16px;
 }
 /*--Print Reports Finish--*/
 
