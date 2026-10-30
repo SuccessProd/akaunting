@@ -23,7 +23,7 @@ class Companies extends ApiController
      */
     public function index()
     {
-        $companies = user()->companies()->collect();
+        $companies = user()->companies()->with('owner')->collect();
 
         return Resource::collection($companies);
     }

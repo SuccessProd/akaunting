@@ -33,7 +33,7 @@ class DocumentTransactions extends ApiController
      */
     public function index($document_id)
     {
-        $transactions = Transaction::with(['document', 'taxes'])->documentId($document_id)->get();
+        $transactions = Transaction::with(['document', 'owner', 'taxes'])->documentId($document_id)->get();
 
         return Resource::collection($transactions);
     }
@@ -67,6 +67,10 @@ class DocumentTransactions extends ApiController
     {
         $document = Document::find($document_id);
 
+        if (! $document instanceof Document) {
+            return $this->errorInternal('No query results for model [' . Document::class . '] ' . $document_id);
+        }
+
         $transaction = $this->dispatch(new CreateBankingDocumentTransaction($document, $request));
 
         return $this->created(route('api.documents.transactions.show', [$document_id, $transaction->id]), new Resource($transaction));
@@ -84,7 +88,15 @@ class DocumentTransactions extends ApiController
     {
         $document = Document::find($document_id);
 
+        if (! $document instanceof Document) {
+            return $this->errorInternal('No query results for model [' . Document::class . '] ' . $document_id);
+        }
+
         $transaction = Transaction::documentId($document_id)->find($id);
+
+        if (! $transaction instanceof Transaction) {
+            return $this->errorInternal('No query results for model [' . Transaction::class . '] ' . $id);
+        }
 
         $transaction = $this->dispatch(new UpdateBankingDocumentTransaction($document, $transaction, $request));
 
@@ -101,6 +113,10 @@ class DocumentTransactions extends ApiController
     public function destroy($document_id, $id)
     {
         $transaction = Transaction::documentId($document_id)->find($id);
+
+        if (! $transaction instanceof Transaction) {
+            return $this->errorInternal('No query results for model [' . Transaction::class . '] ' . $id);
+        }
 
         $this->dispatch(new DeleteTransaction($transaction));
 

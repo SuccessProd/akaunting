@@ -31,7 +31,16 @@ class Widgets extends Controller
     {
         $widgets = Utility::getClasses('all');
 
-        return response()->json($widgets);
+        $settings = [];
+
+        foreach ($widgets as $class => $name) {
+            $settings[$class] = (new $class())->getDefaultSettings();
+        }
+
+        return response()->json([
+            'types' => $widgets,
+            'settings' => $settings,
+        ]);
     }
 
     /**
@@ -54,6 +63,7 @@ class Widgets extends Controller
     {
         $request['settings'] = [
             'width' => $request->get('width'),
+            'limit' => $request->get('limit'),
         ];
 
         $response = $this->ajaxDispatch(new CreateWidget($request));
@@ -97,6 +107,18 @@ class Widgets extends Controller
     {
         $settings = $widget->settings;
 
+        $class_name = $widget->class;
+
+        // Backfill any setting the widget declares but that isn't stored yet
+        // (older widgets, or a value never explicitly set) with the widget's
+        // own default, so the edit form shows the value actually in effect
+        // instead of a blank/null field.
+        foreach ((new $class_name())->getDefaultSettings() as $key => $default_value) {
+            if (! isset($settings->{$key})) {
+                $settings->{$key} = $default_value;
+            }
+        }
+
         return response()->json([
             'class' => $widget->class,
             'name' => $widget->name,
@@ -116,6 +138,7 @@ class Widgets extends Controller
     {
         $request['settings'] = [
             'width' => $request->get('width'),
+            'limit' => $request->get('limit'),
         ];
 
         $response = $this->ajaxDispatch(new UpdateWidget($widget, $request));

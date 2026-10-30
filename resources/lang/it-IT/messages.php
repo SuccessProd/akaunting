@@ -29,6 +29,7 @@ return [
         'no_file'           => 'Errore: Nessun file selezionato!',
         'last_category'     => 'Errore: Impossibile eliminare l\'ultima categoria <b>:type</b>!',
         'transfer_category' => 'Errore: Impossibile eliminare la categoria di trasferimento <b>:type</b>!',
+        'transfer_transaction' => 'Errore: Non sei autorizzato a modificare/eliminare la transazione perché appartiene a un trasferimento!',
         'change_type'       => 'Errore: Impossibile cambiare il tipo perché ha :text collegato!',
         'invalid_apikey'    => 'Errore: La chiave API inserita non è valida!',
         'empty_apikey'      => 'Errore: Non hai inserito la chiave API! <a href=":url" class="font-bold underline underline-offset-4">Fai clic qui</a> per inserire la chiave API.',

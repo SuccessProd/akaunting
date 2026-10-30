@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Sales;
 
-use App\Exports\Sales\Customers as Export;
+use App\Exports\Sales\Customers\Customers as Export;
 use App\Jobs\Common\CreateContact;
 use App\Models\Common\Contact;
 use Illuminate\Http\UploadedFile;
@@ -51,6 +51,18 @@ class CustomersTest extends FeatureTestCase
         $this->assertFlashLevel('success');
 
         $this->assertDatabaseHas('contacts', $request);
+    }
+
+    public function testItShouldNotCreateCustomerWithInvalidUser()
+    {
+        $request = $this->getRequest();
+        $request['user_id'] = 99999;
+
+        $this->withExceptionHandling()
+            ->loginAs()
+            ->postJson(route('customers.store'), $request)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['user_id']);
     }
 
     public function testItShouldCreateCustomerWithUser()
@@ -149,7 +161,7 @@ class CustomersTest extends FeatureTestCase
             '/' . str()->filename(trans_choice('general.customers', 2)) . '-\d{10}\.xlsx/',
             function (Export $export) use ($count) {
                 // Assert that the correct export is downloaded.
-                return $export->collection()->count() === $count;
+                return $export->sheets()[0]->collection()->count() === $count;
             }
         );
     }
@@ -175,7 +187,7 @@ class CustomersTest extends FeatureTestCase
         Excel::assertDownloaded(
             '/' . str()->filename(trans_choice('general.customers', 2)) . '-\d{10}\.xlsx/',
             function (Export $export) use ($select_count) {
-                return $export->collection()->count() === $select_count;
+                return $export->sheets()[0]->collection()->count() === $select_count;
             }
         );
     }

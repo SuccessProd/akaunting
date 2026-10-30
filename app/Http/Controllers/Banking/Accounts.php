@@ -10,12 +10,14 @@ use App\Jobs\Banking\UpdateAccount;
 use App\Models\Banking\Account;
 use App\Models\Banking\Transaction;
 use App\Models\Banking\Transfer;
-use App\Utilities\Date;
+use App\Traits\Cloud;
 use App\Utilities\Reports;
 use App\Models\Setting\Currency;
 
 class Accounts extends Controller
 {
+    use Cloud;
+
     /**
      * Instantiate a new controller instance.
      */
@@ -23,7 +25,7 @@ class Accounts extends Controller
     {
         parent::__construct();
 
-        $this->middleware('permission:create-banking-transactions')->only('createIncome', 'createExpense');
+        $this->middleware('permission:create-banking-transactions')->only('createIncome', 'createExpense', 'importTransactions');
         $this->middleware('permission:create-banking-transfers')->only('createTransfer');
         $this->middleware('permission:read-banking-accounts')->only('seePerformance');
         $this->middleware('permission:read-settings-currencies')->only('currency');
@@ -36,7 +38,12 @@ class Accounts extends Controller
      */
     public function index()
     {
-        $accounts = Account::with('income_transactions', 'expense_transactions')->collect();
+        // The currency is read by every card, so it is loaded with the page rather than per account
+        $accounts = Account::with('currency')
+            ->withSum('income_transactions', 'amount')
+            ->withSum('expense_transactions', 'amount')
+            ->withCount('transactions')
+            ->collect();
 
         return $this->response('banking.accounts.index', compact('accounts'));
     }
@@ -74,13 +81,21 @@ class Accounts extends Controller
     /**
      * Show the form for creating a new resource.
      *
+     * An account that could keep itself up to date should not be typed in by hand without the
+     * option having been seen. While the app that connects banks is missing, the page offers it
+     * in place of the form, the way an empty list offers what can be added to it, and the form
+     * is behind "add without bank feed". With the app installed, the app takes the page over.
+     *
      * @return Response
      */
     public function create()
     {
         $currency = Currency::where('code', '=', default_currency())->first();
 
-        return view('banking.accounts.create', compact('currency'));
+        // Without Bank Feeds the page offers it before the form for an account kept by hand
+        $bank_feed_offer = ! $this->hasCloudBankFeeds();
+
+        return view('banking.accounts.create', compact('currency', 'bank_feed_offer'));
     }
 
     /**
@@ -109,24 +124,6 @@ class Accounts extends Controller
         }
 
         return response()->json($response);
-    }
-
-    /**
-     * Duplicate the specified resource.
-     *
-     * @param  Account $account
-     *
-     * @return Response
-     */
-    public function duplicate(Account $account)
-    {
-        $clone = $account->duplicate();
-
-        $message = trans('messages.success.duplicated', ['type' => trans_choice('general.accounts', 1)]);
-
-        flash($message)->success();
-
-        return redirect()->route('accounts.edit', $clone->id);
     }
 
     /**
@@ -189,7 +186,20 @@ class Accounts extends Controller
             $response['message'] = trans('messages.success.enabled', ['type' => $account->name]);
         }
 
-        return response()->json($response);
+        // The bulk actions ask for this in the background and are handed the outcome to
+        // read; a link on a page is followed by the browser, which has nowhere to put an
+        // answer, so it is sent back to the page it came from with the outcome flashed on it
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($response);
+        }
+
+        if (! empty($response['success'])) {
+            flash($response['message'])->success();
+        } else {
+            flash($response['message'])->error()->important();
+        }
+
+        return redirect()->back();
     }
 
     /**
@@ -207,7 +217,20 @@ class Accounts extends Controller
             $response['message'] = trans('messages.success.disabled', ['type' => $account->name]);
         }
 
-        return response()->json($response);
+        // The bulk actions ask for this in the background and are handed the outcome to
+        // read; a link on a page is followed by the browser, which has nowhere to put an
+        // answer, so it is sent back to the page it came from with the outcome flashed on it
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json($response);
+        }
+
+        if (! empty($response['success'])) {
+            flash($response['message'])->success();
+        } else {
+            flash($response['message'])->error()->important();
+        }
+
+        return redirect()->back();
     }
 
     /**
@@ -257,15 +280,31 @@ class Accounts extends Controller
         return redirect()->route('transfers.create')->withInput($data);
     }
 
+    /**
+     * The transaction import, already pointed at this account.
+     *
+     * Carried in the address rather than in the session, so the page still knows the account
+     * after a reload or a failed import that sends the user back to it.
+     */
+    public function importTransactions(Account $account)
+    {
+        $data['account_id'] = $account->id;
+
+        return redirect()->route('import.create', [
+            'group'         => 'banking',
+            'type'          => 'transactions',
+        ])->withInput($data);
+    }
+
     public function seePerformance(Account $account)
     {
+        // No dates: the report opens on the current financial year
         $data = [
-            'year'          => Date::now()->year,
             'basis'         => 'accrual',
             'account_id'    => $account->id,
         ];
 
-        $report = Reports::getClassInstance('App\Reports\IncomeExpenseSummary');
+        $report = Reports::getClassInstance('App\Reports\IncomeExpenseSummary', false);
 
         if (empty($report) || empty($report->model)) {
             $message = trans('accounts.create_report');
@@ -275,7 +314,10 @@ class Accounts extends Controller
             return redirect()->route('reports.create');
         }
 
-        return redirect()->route('reports.show', $report->model->id)->withInput($data);
+        // In the search string rather than flashed, so refresh, print, reload and bookmarks keep the filter
+        $search = collect($data)->map(fn ($value, $key) => $key . ':' . $value)->implode(' ');
+
+        return redirect()->route('reports.show', ['report' => $report->model->id, 'search' => $search]);
     }
 
     public function currency()

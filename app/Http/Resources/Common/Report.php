@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Common;
 
+use App\Events\Api\ResourceShowing;
 use App\Http\Resources\Auth\Owner;
 use App\Utilities\Reports as Utility;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -16,7 +17,7 @@ class Report extends JsonResource
      */
     public function toArray($request)
     {
-        return [
+        $resources = [
             'id' => $this->id,
             'company_id' => $this->company_id,
             'class' => $this->class,
@@ -29,6 +30,15 @@ class Report extends JsonResource
             'created_from' => $this->created_from,
             'owner' => Owner::from($this->owner),
         ];
+
+        $event = new ResourceShowing($this->resource);
+        event($event);
+
+        if (! empty($event->resources)) {
+            $resources = array_merge($resources, $event->resources);
+        }
+
+        return $resources;
     }
 
     protected function getReportData()
@@ -43,7 +53,7 @@ class Report extends JsonResource
             return [];
         }
 
-        $unset_attributes = ['model', 'views', 'loaded', 'column_name_width', 'column_value_width'];
+        $unset_attributes = ['model', 'views', 'loaded', 'cacheable', 'cached_at', 'column_name_width', 'column_value_width'];
 
         foreach ($unset_attributes as $attribute) {
             unset($report->$attribute);

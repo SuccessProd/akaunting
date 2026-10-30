@@ -29,6 +29,7 @@ return [
         'no_file'           => 'Error: Tidak ada file dipilih!',
         'last_category'     => 'Error: Tidak dapat menghapus kategori <b>:type</b> terakhir!',
         'transfer_category' => 'Error: Tidak dapat menghapus kategori transfer <b>:type</b>!',
+        'transfer_transaction' => 'Error: Anda tidak diperbolehkan mengubah/menghapus transaksi karena termasuk dalam transfer!',
         'change_type'       => 'Error: Tidak dapat mengubah jenis karena memiliki :text terkait!',
         'invalid_apikey'    => 'Error: Kunci API yang dimasukkan tidak valid!',
         'empty_apikey'      => 'Error: Anda belum memasukkan Kunci API! <a href=":url" class="font-bold underline underline-offset-4">Klik di sini</a> untuk memasukkan Kunci API Anda.',

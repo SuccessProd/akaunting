@@ -29,6 +29,7 @@ return [
         'no_file'           => 'Erro: Nenhum arquivo selecionado!',
         'last_category'     => 'Erro: Não é possível excluir a última categoria de <b>:type</b>!',
         'transfer_category' => 'Erro: Não é possível excluir a categoria de transferência <b>:type</b>!',
+        'transfer_transaction' => 'Erro: Você não tem permissão para alterar/excluir a transação porque ela pertence a uma transferência!',
         'change_type'       => 'Erro: Não é possível alterar o tipo porque possui :text relacionado!',
         'invalid_apikey'    => 'Erro: A chave de API inserida é inválida!',
         'empty_apikey'      => 'Erro: Você não inseriu sua chave de API! <a href=":url" class="font-bold underline underline-offset-4">Clique aqui</a> para inserir sua chave de API.',

@@ -3,40 +3,9 @@
         $filters = [];
         $filtered = [];
 
-        $skipped = [
-            'keys', 'names', 'types', 'routes', 'multiple', 'defaults', 'operators',
-        ];
-
-        foreach ($class->filters as $filter_name => $filter_values) {
-            if (in_array($filter_name, $skipped)) {
-                continue;
-            }
-
-            $key = $filter_name;
-
-            if (isset($class->filters['keys']) && !empty($class->filters['keys'][$filter_name])) {
-                $key = $class->filters['keys'][$filter_name];
-            } else if ($key == 'years') {
-                $key = 'year';
-            } else if ($key == 'customers' || $key == 'vendors') {
-                $key = 'contact_id';
-            } else {
-                $key = Str::singular($key) . '_id';
-            }
-
-            $value = '';
-
-            if (isset($class->filters['names']) && !empty($class->filters['names'][$filter_name])) {
-                $value = $class->filters['names'][$filter_name];
-            } else if (trans('reports.' . $filter_name) != 'reports.' . $filter_name) {
-                $value = (strpos(trans('reports.' . $filter_name), '|') !== false) ? trans_choice('reports.' . $filter_name, 1) : trans('reports.' . $filter_name);
-            } else {
-                $value = (strpos(trans('general.' . $filter_name), '|') !== false) ? trans_choice('general.' . $filter_name, 1) : trans('general.' . $filter_name);
-            }
-
-            if ($key == 'year') {
-                $value = trans('general.financial_year');
-            }
+        foreach ($class->getFilterChips() as $filter_name => $filter_values) {
+            $key = $class->getFilterKey($filter_name);
+            $value = $class->getFilterLabel($filter_name);
 
             $type = 'select';
 
@@ -64,16 +33,6 @@
                 $operators = $class->filters['operators'][$filter_name];
             }
 
-            if ($key == 'year') {
-                //$default_value = \Date::now()->year;
-
-                $operators = [
-                    'equal'     => true,
-                    'not_equal' => false,
-                    'range'     => false,
-                ];
-            }
-
             $multiple = false;
 
             if (isset($class->filters['multiple']) && !empty($class->filters['multiple'][$filter_name])) {
@@ -83,6 +42,7 @@
             $filters[] = [
                 'key'       => $key,
                 'value'     => $value,
+                'operator'  => '=',
                 'type'      => $type,
                 'url'       => $url,
                 'values'    => $filter_values,

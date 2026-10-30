@@ -29,6 +29,7 @@ return [
         'no_file'           => 'Hata: Dosya seçilmedi!',
         'last_category'     => 'Hata: Son :type kategorisini silemezsiniz!',
         'transfer_category' => 'Hata: Transfer <b>:type</b> kategorisi silinemez!',
+        'transfer_transaction' => 'Hata: İşlem bir transfere ait olduğu için değiştirilemez/silinemez!',
         'change_type'       => 'Hata: Tür değiştirilemez çünkü :text ilişki mevcut!',
         'invalid_apikey'    => 'Hata: Girdiğiniz API Anahtarı geçersiz!',
         'empty_apikey'      => 'Hata: API Anahtarınızı girmediniz! API Anahtarınızı girmek için <a href=":url" class="font-bold underline underline-offset-4">buraya tıklayın</a>.',

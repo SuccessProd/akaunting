@@ -12,6 +12,7 @@ return [
         'disabled'          => ':type zakázaný!',
     ],
     'error' => [
+        'transfer_transaction' => 'Chyba: Nemáte oprávnenie meniť/mazať transakciu, pretože patrí k prevodu!',
         'over_payment'      => 'Chyba: Platba nebola pridaná! Suma, ktor[ ste zadali prekročila celkovú sumu.',
         'not_user_company'  => 'Chyba: Nemôžete spravovať túto spoločnosť!',
         'customer'          => 'Chyba: Používateľ nebol vytvorený! :name už používa táto e-mail adresa.',

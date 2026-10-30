@@ -29,6 +29,7 @@ return [
         'no_file'           => 'Erreur : Aucun fichier sélectionné !',
         'last_category'     => 'Erreur : Impossible de supprimer la dernière catégorie de <b>:type</b> !',
         'transfer_category' => 'Erreur : Impossible de supprimer la catégorie de transfert <b>:type</b> !',
+        'transfer_transaction' => 'Erreur : Vous n\'êtes pas autorisé à modifier/supprimer cette transaction car elle appartient à un transfert !',
         'change_type'       => 'Erreur : Impossible de changer le type car il est lié à :text !',
         'invalid_apikey'    => 'Erreur : La clé API saisie n\'est pas valide !',
         'empty_apikey'      => 'Erreur : Votre clé d\'API n\'a pas été entrée ! <a href=":url" class="font-bold underline underline-offset-4">Cliquez ici</a> pour enregistrer votre clé d\'API.',

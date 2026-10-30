@@ -12,6 +12,7 @@ return [
         'disabled'          => ':type disabled!',
     ],
     'error' => [
+        'transfer_transaction' => 'שגיאה: אינך רשאי לשנות/למחוק את התנועה מכיוון שהיא שייכת להעברה!',
         'over_payment'      => 'Error: Payment not added! The amount you entered passes the total: :amount',
         'not_user_company'  => 'שגיאה: אינך מורשה לנהל החברה זאת!',
         'customer'          => 'שגיאה: המשתמש לא נוצר! :name כבר משתמש בכתוב הזאת.',

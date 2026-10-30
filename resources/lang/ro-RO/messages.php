@@ -21,6 +21,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Eroare: Nu vă este permis să modificați/ștergeți tranzacția deoarece aparține unui transfer!',
         'over_payment'      => 'Eroare: Plata nu a fost adăugată! Suma pe care ați introdus-o depășește totalul: :amount',
         'not_user_company'  => 'Eroare: Nu ai permisiunea necesara pentru a gestiona această companie!',
         'customer'          => 'Eroare: Utilizatorul nu a fost creat! :name deja folosește aceasta adresa de email.',

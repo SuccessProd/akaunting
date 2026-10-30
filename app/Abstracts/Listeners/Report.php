@@ -249,6 +249,31 @@ abstract class Report
         }
     }
 
+    /**
+     * Keep the rows the search string chose for the key: those ids, or
+     * every other row when "not" excludes them.
+     */
+    public function filterRowsBySearchString(
+        array $rows,
+        string $key,
+        string $input = '',
+    ): array {
+        $value = $this->getSearchStringValue($key, '', $input);
+
+        if (! is_string($value) || $value === '') {
+            return $rows;
+        }
+
+        $ids = explode(',', $value);
+        $exclude = $this->getSearchStringOperator($key, '=', $input) == '!=';
+
+        return array_filter(
+            array: $rows,
+            callback: fn ($id) => in_array($id, $ids) !== $exclude,
+            mode: ARRAY_FILTER_USE_KEY,
+        );
+    }
+
     public function setRowNamesAndValues($event, $rows)
     {
         $nodes = [];
@@ -276,36 +301,55 @@ abstract class Report
         }
     }
 
+    /**
+     * Preloaded parent => children map, used while building the category tree.
+     */
+    protected $preloaded_sub_categories = null;
+
     public function getCategoriesNodes($categories)
     {
         $nodes = [];
 
+        // Load all categories once and walk the tree in memory (avoids the per-node N+1).
+        $all = Category::query()->withSubCategory()->orderBy('name')->getWithoutChildren();
+
+        $keyed = $all->keyBy('id');
+
+        // Only the given categories are nested, so a chip-filtered list keeps its rows and its tree in step:
+        // a category whose parent was left out is listed on its own, and a child that was left out is not nested
+        $given = array_fill_keys(collect($categories)->keys()->all(), true);
+
+        $this->preloaded_sub_categories = $all->filter(fn ($category) => isset($given[$category->id]))->groupBy('parent_id');
+
         foreach ($categories as $id => $name) {
-            $category = Category::withSubCategory()->find($id);
+            $category = $keyed->get($id);
 
-            if (!is_null($category->parent_id)) {
-                unset($categories[$id]);
-
+            if (is_null($category) || isset($given[$category->parent_id])) {
                 continue;
             }
 
             $nodes[$id] = $this->getSubCategories($category);
         }
 
+        $this->preloaded_sub_categories = null;
+
         return $nodes;
     }
 
     public function getSubCategories($category)
     {
-        if ($category->sub_categories->count() == 0) {
+        // Read the children from the preloaded map when getCategoriesNodes() filled it in.
+        $sub_categories_list = ! is_null($this->preloaded_sub_categories)
+            ? ($this->preloaded_sub_categories->get($category->id) ?? collect())
+            : $category->sub_categories;
+
+        if ($sub_categories_list->count() == 0) {
             return null;
         }
 
         $sub_categories = [];
 
-        foreach ($category->sub_categories as $sub_category) {
-            $sub_category->load('sub_categories');
-
+        foreach ($sub_categories_list as $sub_category) {
             $sub_categories[$sub_category->id] = $this->getSubCategories($sub_category);
         }
 

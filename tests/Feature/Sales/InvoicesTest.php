@@ -26,6 +26,118 @@ class InvoicesTest extends FeatureTestCase
             ->assertSeeText(trans_choice('general.invoices', 2));
     }
 
+    public function testItShouldSortInvoiceListByDocumentNumber()
+    {
+        $this->loginAs();
+
+        $document_numbers = [
+            'INV-0992',
+            'INV-0799',
+            'INV-0792',
+            'INV-0733',
+            'INV-0488',
+            'INV-0351',
+            'INV-0239',
+            'INV-1117',
+            'INV-1185',
+        ];
+
+        foreach ($document_numbers as $document_number) {
+            Document::factory()->invoice()->create([
+                'company_id' => $this->company->id,
+                'document_number' => $document_number,
+            ]);
+        }
+
+        $this->get(route('invoices.index', ['list_records' => 'all']))
+            ->assertStatus(200)
+            ->assertViewHas('invoices', function ($invoices) {
+                $document_numbers = $invoices->getCollection()
+                    ->whereIn('document_number', [
+                        'INV-0992',
+                        'INV-0799',
+                        'INV-0792',
+                        'INV-0733',
+                        'INV-0488',
+                        'INV-0351',
+                        'INV-0239',
+                        'INV-1117',
+                        'INV-1185',
+                    ])
+                    ->pluck('document_number')
+                    ->all();
+
+                return $document_numbers === [
+                    'INV-1185',
+                    'INV-1117',
+                    'INV-0992',
+                    'INV-0799',
+                    'INV-0792',
+                    'INV-0733',
+                    'INV-0488',
+                    'INV-0351',
+                    'INV-0239',
+                ];
+            });
+
+        $this->get(route('invoices.index', [
+            'list_records' => 'all',
+            'sort' => 'document_number',
+            'direction' => 'asc',
+        ]))
+            ->assertStatus(200)
+            ->assertViewHas('invoices', function ($invoices) {
+                $document_numbers = $invoices->getCollection()
+                    ->whereIn('document_number', [
+                        'INV-0992',
+                        'INV-0799',
+                        'INV-0792',
+                        'INV-0733',
+                        'INV-0488',
+                        'INV-0351',
+                        'INV-0239',
+                        'INV-1117',
+                        'INV-1185',
+                    ])
+                    ->pluck('document_number')
+                    ->all();
+
+                return $document_numbers === [
+                    'INV-0239',
+                    'INV-0351',
+                    'INV-0488',
+                    'INV-0733',
+                    'INV-0792',
+                    'INV-0799',
+                    'INV-0992',
+                    'INV-1117',
+                    'INV-1185',
+                ];
+            });
+    }
+
+    public function testItShouldShowOnlyUnpaidInvoicesOnUnpaidTab()
+    {
+        $this->loginAs();
+
+        foreach (['sent', 'viewed', 'partial', 'paid', 'draft'] as $status) {
+            Document::factory()->invoice()->create([
+                'company_id' => $this->company->id,
+                'status' => $status,
+            ]);
+        }
+
+        $this->get(route('invoices.index'))
+            ->assertStatus(200)
+            ->assertViewHas('invoices', function ($invoices) {
+                return $invoices->getCollection()
+                    ->pluck('status')
+                    ->sort()
+                    ->values()
+                    ->all() === ['partial', 'sent', 'viewed'];
+            });
+    }
+
     public function testItShouldPreloadCustomerEmailCountOnInvoiceListPage()
     {
         $this->loginAs();
@@ -119,6 +231,26 @@ class InvoicesTest extends FeatureTestCase
 
         $this->assertSame('2025-12-22', $document->issued_at->format('Y-m-d'));
         $this->assertSame('2025-12-29', $document->due_at->format('Y-m-d'));
+    }
+
+    public function testItShouldNotCreateInvoiceWithInvalidRelationsThroughApi()
+    {
+        $request = $this->getRequest();
+        $request['contact_id'] = 99999;
+        $request['category_id'] = 99999;
+
+        $this->withExceptionHandling()
+            ->withHeaders([
+                'Authorization' => 'Basic ' . base64_encode('test@company.com:123456'),
+            ])
+            ->postJson(route('api.documents.store', ['search' => 'type:invoice']), $request)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'contact_id' => trans('validation.exists', ['attribute' => 'contact id']),
+                'category_id' => trans('validation.exists', ['attribute' => 'category id']),
+            ]);
+
+        $this->assertDatabaseMissing('documents', ['document_number' => $request['document_number']]);
     }
 
     public function testItShouldCreateInvoiceWithAttachment()

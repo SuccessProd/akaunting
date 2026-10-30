@@ -14,6 +14,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Villa: Þú hefur ekki heimild til að breyta/eyða færslunni því hún tilheyrir millifærslu!',
         'over_payment'      => 'Error: Greiðslu ekki bætt við! Upphæðin sem þú settir inn er hærri en: :amount',
         'not_user_company'  => 'Error: Þú hefur ekki heimild til að stjórna þessu fyrirtæki!',
         'customer'          => 'Error: Notandi ekki skapaður! :name hefur þegar skráð þetta netfang.',

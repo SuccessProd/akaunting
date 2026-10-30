@@ -9,6 +9,7 @@ use App\Notifications\Common\ImportCompleted;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Exceptions\SheetNotFoundException;
 use Maatwebsite\Excel\Validators\ValidationException;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Throwable;
 
 class Import
@@ -28,6 +29,16 @@ class Import
             $should_queue = should_queue();
 
             $file = $request->file('import');
+
+            // Checked upfront because the reader fails deep inside on a missing sheet.
+            if (self::hasMissingSheets($class, $file)) {
+                return [
+                    'success'   => false,
+                    'error'     => true,
+                    'data'      => null,
+                    'message'   => trans('messages.error.import_sheet'),
+                ];
+            }
 
             if ($should_queue) {
                 self::importQueue($class, $file, $translation);
@@ -58,6 +69,36 @@ class Import
     }
 
     /**
+     * Whether the file is missing a sheet the import declares.
+     *
+     * @param AbstractsImport|ImportMultipleSheets $class
+     */
+    protected static function hasMissingSheets($class, $file): bool
+    {
+        if (! $class instanceof ImportMultipleSheets) {
+            return false;
+        }
+
+        try {
+            $path = $file->getRealPath();
+
+            $reader = IOFactory::createReaderForFile($path);
+
+            // A csv has no worksheets to compare against.
+            if (! method_exists($reader, 'listWorksheetNames')) {
+                return false;
+            }
+
+            $names = $reader->listWorksheetNames($path);
+        } catch (Throwable $e) {
+            // The file type could not be read here, so leave it to the import itself.
+            return false;
+        }
+
+        return ! empty(array_diff(array_keys($class->sheets()), $names));
+    }
+
+    /**
      * Import the excel file
      *
      * @param AbstractsImport|ImportMultipleSheets $class
@@ -70,11 +111,7 @@ class Import
 
         if (! empty($rows[0])) {
             $total_rows = count($rows[0]);
-        } else if (! empty($sheets = $class->sheets())) {
-            // The uploaded file's sheet names may not match the expected keys
-            // (e.g. a single-sheet file, or differently named sheets), so the
-            // expected key may be absent from $rows — default to 0 instead of
-            // crashing on an undefined array key.
+        } else if ($class instanceof ImportMultipleSheets && ! empty($sheets = $class->sheets())) {
             $total_rows = count($rows[array_keys($sheets)[0]] ?? []);
         }
 

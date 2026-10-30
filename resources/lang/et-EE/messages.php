@@ -16,6 +16,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Viga: Teil pole lubatud tehingut muuta/kustutada, kuna see kuulub ülekande juurde!',
         'over_payment'      => 'Viga: Makseviisi pole lisatud. Sisestatud summa ületab summa: :amount',
         'not_user_company'  => 'Viga: Teil pole lubatud seda ettevõtet haldama!',
         'customer'          => 'Viga: Kasutajat ei loodud! :name juba kasutab seda e-posti aadressi.',

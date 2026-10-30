@@ -21,8 +21,8 @@ class Setting extends FormRequest
         switch ($prefix) {
             case 'company':
                 $logo = 'mimes:' . config('filesystems.mimes')
-                        . '|between:0,' . config('filesystems.max_size') * 1024
-                        . '|dimensions:max_width=' . config('filesystems.max_width') . ',max_height=' . config('filesystems.max_height');
+                    . '|between:0,' . config('filesystems.max_size') * 1024
+                    . '|dimensions:max_width=' . config('filesystems.max_width') . ',max_height=' . config('filesystems.max_height');
 
                 $rules = [
                     'name'  => 'required|string',
@@ -32,12 +32,14 @@ class Setting extends FormRequest
 
                 break;
             case 'default':
+                $company_id = (int) $this->request->get('company_id', company_id());
+
                 $rules = [
-                    'account'           => 'required|string',
+                    'account'           => 'required|string|exists:accounts,id,company_id,' . $company_id . ',deleted_at,NULL',
                     'currency'          => 'required|string|currency',
                     'locale'            => 'required|string',
-                    'expense_category'  => 'required|integer',
-                    'income_category'   => 'required|integer',
+                    'expense_category'  => 'required|integer|exists:categories,id,company_id,' . $company_id . ',deleted_at,NULL',
+                    'income_category'   => 'required|integer|exists:categories,id,company_id,' . $company_id . ',deleted_at,NULL',
                     'payment_method'    => 'required|string|payment_method',
                     'address_format'    => 'required|string',
                 ];

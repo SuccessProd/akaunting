@@ -29,6 +29,7 @@ return [
         'no_file'           => 'Ralat: Tiada fail dipilih!',
         'last_category'     => 'Ralat: Tidak boleh memadam kategori <b>:type</b> terakhir!',
         'transfer_category' => 'Ralat: Tidak boleh memadam kategori pemindahan <b>:type</b>!',
+        'transfer_transaction' => 'Ralat: Anda tidak dibenarkan menukar/memadam transaksi kerana ia milik pemindahan!',
         'change_type'       => 'Ralat: Tidak boleh menukar jenis kerana ia mempunyai :text yang berkaitan!',
         'invalid_apikey'    => 'Ralat: Kunci API yang dimasukkan tidak sah!',
         'empty_apikey'      => 'Ralat: Anda belum memasukkan Kunci API! <a href=":url" class="font-bold underline underline-offset-4">Klik di sini</a> untuk memasukkan Kunci API anda.',

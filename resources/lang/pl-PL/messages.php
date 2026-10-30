@@ -29,6 +29,7 @@ return [
         'no_file'           => 'Błąd: Nie wybrano pliku!',
         'last_category'     => 'Błąd: Nie można usunąć ostatniej kategorii <b>:type</b>!',
         'transfer_category' => 'Błąd: Nie można usunąć kategorii transferu <b>:type</b>!',
+        'transfer_transaction' => 'Błąd: Nie możesz zmienić/usunąć transakcji, ponieważ należy do transferu!',
         'change_type'       => 'Błąd: Nie można zmienić typu, ponieważ ma powiązane :text!',
         'invalid_apikey'    => 'Błąd: Wprowadzony klucz API jest nieprawidłowy!',
         'empty_apikey'      => 'Błąd: Nie wprowadziłeś swojego klucza API! <a href=":url" class="font-bold underline underline-offset-4">Kliknij tutaj</a>, aby wprowadzić swój klucz API.',

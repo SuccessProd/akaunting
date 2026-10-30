@@ -3,7 +3,6 @@
 namespace App\Listeners\Report;
 
 use App\Abstracts\Listeners\Report as Listener;
-use App\Events\Report\FilterApplying;
 use App\Events\Report\FilterShowing;
 use App\Events\Report\GroupApplying;
 use App\Events\Report\GroupShowing;
@@ -30,6 +29,12 @@ class AddCustomers extends Listener
         $event->class->filters['customers'] = $this->getCustomers(true);
         $event->class->filters['routes']['customers'] = ['customers.index', 'search=enabled:1'];
         $event->class->filters['multiple']['customers'] = true;
+        $event->class->filters['operators']['customers'] = [
+            'equal'     => true,
+            'not_equal' => true,
+            'multiple'  => true,
+            'range'     => false,
+        ];
     }
 
     /**
@@ -63,32 +68,6 @@ class AddCustomers extends Listener
     }
 
     /**
-     * Handle filter applying event.
-     *
-     * @param  $event
-     * @return void
-     */
-    public function handleFilterApplying(FilterApplying $event)
-    {
-        if ($this->skipThisClass($event)) {
-            return;
-        }
-
-        $model_type = $event->args['model_type'] ?? 'invoice';
-        if (! in_array($model_type, ['invoice', 'income'])) {
-            return;
-        }
-
-        if ($customer_ids = $this->getSearchStringValue('customer_id')) {
-            $where = $this->getSearchStringOperator('customer_id') == '!='
-                ? 'whereNotIn'
-                : 'whereIn';
-
-            $event->model->{$where}('contact_id', array_map('intval', explode(',', $customer_ids)));
-        }
-    }
-
-    /**
      * Handle rows showing event.
      *
      * @param  $event
@@ -100,17 +79,8 @@ class AddCustomers extends Listener
             return;
         }
 
-        $all_customers = $this->getCustomers();
-
-        if ($customer_ids = $this->getSearchStringValue('customer_id')) {
-            $customers = explode(',', $customer_ids);
-
-            $rows = collect($all_customers)->filter(function ($value, $key) use ($customers) {
-                return in_array($key, $customers);
-            });
-        } else {
-            $rows = $all_customers;
-        }
+        // The customer chip sends contact_id, as every contact chip does
+        $rows = $this->filterRowsBySearchString($this->getCustomers(), 'contact_id');
 
         $this->setRowNamesAndValues($event, $rows);
     }

@@ -13,6 +13,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Xato: Tranzaksiyani oʻzgartirish/oʻchirish mumkin emas, chunki u oʻtkazmaga tegishli!',
         'over_payment'      => 'Xato: to\'lov qo\'shilmadi! Siz kiritgan miqdor umumiy miqdordan ko\'p: : miqdori',
         'not_user_company'  => 'Xato: ushbu kompaniyani boshqarish huquqingiz yo\'q!',
         'customer'          => 'Xato: foydalanuvchi yaratilmadi! : ism allaqachon ushbu elektron manzilni ishlatgan.',

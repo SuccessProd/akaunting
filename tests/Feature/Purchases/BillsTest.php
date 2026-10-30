@@ -17,6 +17,14 @@ use Tests\Feature\FeatureTestCase;
 
 class BillsTest extends FeatureTestCase
 {
+    public function testItShouldUseVendorPaymentTemplateForBillPayments()
+    {
+        $email_template = config('type.document.' . Document::BILL_TYPE . '.transaction.email_template');
+
+        $this->assertEquals('payment_made_vendor', $email_template);
+        $this->assertNotEquals('invoice_payment_customer', $email_template);
+    }
+
     public function testItShouldSeeBillListPage()
     {
         $this->loginAs()
@@ -58,6 +66,26 @@ class BillsTest extends FeatureTestCase
         $this->assertDatabaseHas('documents', [
             'document_number' => $request['document_number'],
         ]);
+    }
+
+    public function testItShouldNotCreateBillWithInvalidRelationsThroughApi()
+    {
+        $request = $this->getRequest();
+        $request['contact_id'] = 99999;
+        $request['category_id'] = 99999;
+
+        $this->withExceptionHandling()
+            ->withHeaders([
+                'Authorization' => 'Basic ' . base64_encode('test@company.com:123456'),
+            ])
+            ->postJson(route('api.documents.store', ['search' => 'type:bill']), $request)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors([
+                'contact_id' => trans('validation.exists', ['attribute' => 'contact id']),
+                'category_id' => trans('validation.exists', ['attribute' => 'category id']),
+            ]);
+
+        $this->assertDatabaseMissing('documents', ['document_number' => $request['document_number']]);
     }
 
     public function testItShouldCreateBillWithAttachment()

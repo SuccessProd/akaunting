@@ -13,6 +13,11 @@ class ExpensesByCategory extends Widget
 
     public $report_class = 'App\Reports\ExpenseSummary';
 
+    public $default_settings = [
+        'width' => '50',
+        'limit' => 6,
+    ];
+
     public function show()
     {
         $this->setData();
@@ -32,7 +37,7 @@ class ExpensesByCategory extends Widget
             $this->addMoneyToDonutChart($category->colorHexCode, $amount, $category->name);
         });
 
-        $chart = $this->getDonutChart(trans_choice('general.expenses', 2), '100%', 300, 6);
+        $chart = $this->getDonutChart(trans_choice('general.expenses', 2), '100%', 300, (int) ($this->model?->settings?->limit ?? 6));
 
         $chart->options['legend']['width'] = 160;
         $chart->options['legend']['position'] = 'right';

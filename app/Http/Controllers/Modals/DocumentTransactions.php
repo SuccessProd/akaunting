@@ -75,7 +75,7 @@ class DocumentTransactions extends Controller
      */
     public function create(Document $document)
     {
-        $this->authorizeDocumentTransaction($document, 'read');
+        $this->authorizeDocumentTransaction($document, 'create');
 
         $document->load(['totals', 'transactions']);
 
@@ -113,7 +113,6 @@ class DocumentTransactions extends Controller
             ],
             'payment' => [
                 'text' => trans('invoices.accept_payments'),
-                'class' => 'long-texts',
                 'before_text' => trans('general.get_paid_faster'),
                 'class' => 'px-6 py-1.5 text-xs bg-gray-200 hover:bg-purple-200 font-medium rounded-lg leading-6 long-texts',
                 'url' => route('apps.categories.show', [
@@ -263,8 +262,9 @@ class DocumentTransactions extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  $item
-     * @param  $request
+     * @param  Document  $document
+     * @param  Transaction  $transaction
+     * @param  Request  $request
      * @return Response
      */
     public function update(Document $document, Transaction $transaction, Request $request)
@@ -339,7 +339,7 @@ class DocumentTransactions extends Controller
             ];
 
             $quin = '?';
-    
+
             if (Str::contains($redirect, '?')) {
                 $quin = '&';
             }

@@ -80,7 +80,10 @@ class Items extends BulkAction
 
     public function destroy($request)
     {
-        $items = $this->getSelectedRecords($request, 'taxes');
+        // DeleteItem counts these for every record before deleting it.
+        $items = $this->model::with('taxes')
+            ->withCount(['invoice_items', 'bill_items'])
+            ->find($this->getSelectedInput($request));
 
         foreach ($items as $item) {
             try {

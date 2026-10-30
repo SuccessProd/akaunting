@@ -25,6 +25,8 @@
         <x-form.input.hidden name="status" :value="old('status', $status)" v-model="form.status" />
         <x-form.input.hidden name="amount" :value="old('amount', '0')" v-model="form.amount" />
 
+        <x-documents.form.tax-rate :type="$type" />
+
         @if (! $hideButtons)
             <x-documents.form.buttons :type="$type" />
         @endif

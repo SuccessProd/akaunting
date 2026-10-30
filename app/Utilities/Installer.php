@@ -155,7 +155,7 @@ class Installer
         static::saveDbVariables($host, $port, $database, $username, $password, $prefix);
 
         // Try to increase the maximum execution time
-        set_time_limit(300); // 5 minutes
+        set_time_limit(900); // 15 minutes, same as the update flow
 
         // Create tables
         Artisan::call('migrate', ['--force' => true]);
@@ -213,7 +213,7 @@ class Installer
             'DB_PORT'       =>  $port,
             'DB_DATABASE'   =>  $database,
             'DB_USERNAME'   =>  $username,
-            'DB_PASSWORD'   =>  '"' . $password . '"',
+            'DB_PASSWORD'   =>  $password,
             'DB_PREFIX'     =>  $prefix,
         ]);
 
@@ -223,6 +223,17 @@ class Installer
         $db = Config::get('database.connections.' . $con);
 
         $db['host'] = $host;
+        $db['port'] = $port;
+
+        // Only mysql and mariadb split reads from writes, and there the split
+        // takes precedence over the host above. Adding these keys to a driver
+        // that has none would turn it into a read/write connection for no
+        // reason, so leave those connections alone.
+        if (isset($db['read'], $db['write'])) {
+            $db['read']['host'] = [$host];
+            $db['write']['host'] = [$host];
+        }
+
         $db['database'] = $database;
         $db['username'] = $username;
         $db['password'] = $password;
@@ -297,12 +308,14 @@ class Installer
         foreach ($data as $data_key => $data_value) {
             $updated = false;
 
+            $line = $data_key . '=' . static::formatEnvValue($data_value);
+
             foreach ($env as $env_key => $env_value) {
                 $entry = explode('=', $env_value, 2);
 
                 // Check if new or old key
                 if ($entry[0] == $data_key) {
-                    $env[$env_key] = $data_key . '=' . $data_value;
+                    $env[$env_key] = $line;
                     $updated = true;
                 } else {
                     $env[$env_key] = $env_value;
@@ -311,7 +324,7 @@ class Installer
 
             // Lets create if not available
             if (!$updated) {
-                $env[] = $data_key . '=' . $data_value;
+                $env[] = $line;
             }
         }
 
@@ -320,5 +333,26 @@ class Installer
         file_put_contents(base_path('.env'), $env);
 
         return true;
+    }
+
+    /**
+     * Format a raw value for a .env line.
+     *
+     * Plain values are written as they are. Anything else is double quoted, with
+     * line breaks flattened and \, " and $ escaped, so the value can neither end
+     * its line and append keys (dotenv keeps the last duplicate) nor expand
+     * another variable such as ${APP_KEY}.
+     */
+    public static function formatEnvValue($value): string
+    {
+        $value = (string) $value;
+
+        if (preg_match('/\A[\w.,:\/@+=%~-]*\z/', $value)) {
+            return $value;
+        }
+
+        $value = str_replace(["\r\n", "\r", "\n"], ' ', $value);
+
+        return '"' . str_replace(['\\', '"', '$'], ['\\\\', '\\"', '\\$'], $value) . '"';
     }
 }

@@ -27,6 +27,7 @@ return [
         'no_file'           => 'Kļūda: Fails nav izvēlēts!',
         'last_category'     => 'Kļūda: Nevar izdzēst pēdējo :type kategoriju!',
         'transfer_category' => 'Kļūda: Nevar izdzēst pārsūtīšanas kategoriju <b>:type</b>!',
+        'transfer_transaction' => 'Kļūda: Jums nav atļauts mainīt/dzēst transakciju, jo tā pieder pārskaitījumam!',
         'change_type'       => 'Kļūda: tipu nevar mainīt, jo tas ir saistīts ar tekstu!',
         'invalid_apikey'    => 'Kļūda: ievadītā API atslēga nav derīga!',
         'import_column'     => 'Kļūda: :ziņa Lapas nosaukums: :kolonna. Rindas numurs: :līnija',

@@ -29,6 +29,7 @@ return [
         'no_file'           => '错误：未选择文件！',
         'last_category'     => '错误：无法删除最后一个 <b>:type</b> 分类！',
         'transfer_category' => '错误：无法删除转账 <b>:type</b> 分类！',
+        'transfer_transaction' => '错误：您无权更改/删除交易，因为它属于转账！',
         'change_type'       => '错误：无法更改类型，因为它有 :text 相关！',
         'invalid_apikey'    => '错误：输入的 API 密钥无效！',
         'empty_apikey'      => '错误：您尚未输入 API 密钥！<a href=":url" class="font-bold underline underline-offset-4">点击此处</a>输入您的 API 密钥。',

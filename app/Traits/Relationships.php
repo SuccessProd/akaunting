@@ -20,7 +20,14 @@ trait Relationships
         $counter = [];
 
         foreach ((array) $record->relationships as $relationship => $text) {
-            if (!$c = $model->$relationship()->count()) {
+            // A count loaded upfront with withCount() saves a query per record in bulk deletes.
+            $count_attribute = $relationship . '_count';
+
+            $c = array_key_exists($count_attribute, $model->getAttributes())
+                ? (int) $model->getAttribute($count_attribute)
+                : $model->$relationship()->count();
+
+            if (! $c) {
                 continue;
             }
 

@@ -14,6 +14,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Hiba: Nem módosíthatja/törölheti a tranzakciót, mert egy átvezetéshez tartozik!',
         'over_payment'      => '
 Hiba: A fizetés nincs hozzáadva! A megadott összeg meghaladja a következő összeget:: összeg',
         'not_user_company'  => 'Hiba: Ön nem kezelheti ezt a céget!',

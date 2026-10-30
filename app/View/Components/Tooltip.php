@@ -9,6 +9,8 @@ class Tooltip extends Component
 {
     public $id;
 
+    public $dynamicId;
+
     public $placement;
 
     public $tooltipPosition;
@@ -39,8 +41,10 @@ class Tooltip extends Component
         string $size = '',
         string $whitespace = '',
         string $width = 'auto',
+        string $dynamicId = '',
     ) {
         $this->id = $this->getId($id);
+        $this->dynamicId = $dynamicId;
         $this->placement = $this->getPlacement($placement);
         $this->tooltipPosition = $this->getTooltipPosition($tooltipPosition);
 

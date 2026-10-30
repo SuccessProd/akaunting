@@ -21,6 +21,7 @@ return [
     ],
 
     'error' => [
+        'transfer_transaction' => 'Greška: Nije vam dozvoljeno mijenjati/brisati transakciju jer pripada prijenosu!',
         'over_payment'      => 'Greška: Uplata nije dodana! Upisani iznos uplate premašuje ukupni iznos: :amount',
         'not_user_company'  => 'Pogreška: Nije vam dozvoljeno upravljanje ovom kompanijom!',
         'customer'          => 'Pogreška: Korisnik nije kreiran! :name već koristi ovu e-mail adresu.',

@@ -284,6 +284,16 @@
                             <div class="flex items-center justify-between h-10 ltr:ml-3 rtl:mr-3 my-3" v-for="(row_tax, row_tax_index) in row.tax_ids"
                                 :index="row_tax_index"
                             >
+                                <div v-if="taxRateChanged(row_tax)" class="absolute text-sm ltr:right-1/5 rtl:left-1/5 ltr:-ml-7 rtl:-mr-7">
+                                    <x-tooltip dynamic-id="'tooltip-tax-rate-' + index + '-' + row_tax_index" placement="top" size="w-48">
+                                        <x-icon icon="info" class="text-lg text-orange-500 cursor-help" />
+
+                                        <x-slot name="message">
+                                            @{{ taxRateNote(row_tax) }}
+                                        </x-slot>
+                                    </x-tooltip>
+                                </div>
+
                                 <span class="absolute text-sm ltr:right-1/2 rtl:left-1/2 ltr:-ml-7 rtl:-mr-7">{{ trans_choice('general.taxes', 1) }}</span>
 
                                 <div class="lg:w-1/4 lg:absolute">
@@ -325,7 +335,7 @@
                                             'key' => 'id',
                                             'value' => 'title'
                                         ]) }}"
-                                        @interface="row_tax.id = $event"
+                                        @interface="onChangeTaxRow(row_tax, $event)"
                                         @change="onCalculateTotal()"
                                         @new="dynamic_taxes.push($event)"
                                         :form-error="form.errors.get('items.' + index + '.taxes')"
@@ -366,7 +376,7 @@
                                 </div>
 
                                 <div class="flex items-center lg:absolute ltr:right-0 rtl:left-0">
-                                    <div class="ltr:text-right rtl:text-left">
+                                    <div class="ltr:text-right rtl:text-left ltr:mr-2 rtl:ml-2">
                                         <x-form.input.money
                                             name="tax"
                                             value="0"
